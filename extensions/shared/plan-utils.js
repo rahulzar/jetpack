@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { compact, get, startsWith } from 'lodash';
+import { compact, get, startsWith, map, filter, head } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,28 +50,28 @@ export function getUpgradeUrl( { planSlug, plan, postId, postType } ) {
 	// Post-checkout: redirect back here
 	const redirect_to = isSimpleSite()
 		? addQueryArgs(
-			'/' +
-			compact( [ postTypeEditorRoutePrefix, postType, getSiteFragment(), postId ] ).join(
-				'/'
-			),
-			{
-				plan_upgraded: 1,
-			}
-		)
+				'/' +
+					compact( [ postTypeEditorRoutePrefix, postType, getSiteFragment(), postId ] ).join( '/' ),
+				{
+					plan_upgraded: 1,
+				}
+		  )
 		: addQueryArgs(
-			window.location.protocol +
-			`//${ getSiteFragment().replace( '::', '/' ) }/wp-admin/post.php`,
-			{
-				action: 'edit',
-				post: postId,
-				plan_upgraded: 1,
-			}
-		);
+				window.location.protocol +
+					`//${ getSiteFragment().replace( '::', '/' ) }/wp-admin/post.php`,
+				{
+					action: 'edit',
+					post: postId,
+					plan_upgraded: 1,
+				}
+		  );
 
-	return planPathSlug &&
+	return (
+		planPathSlug &&
 		addQueryArgs( `https://wordpress.com/checkout/${ getSiteFragment() }/${ planPathSlug }`, {
 			redirect_to,
-		} );
+		} )
+	);
 }
 
 /**
@@ -92,6 +92,27 @@ export function isUpgradable( name ) {
 	return isSimpleSite() && requiresPaidPlan( unavailableReason, details );
 }
 
+/*
+ * Usable blocks list with a free plan.
+ * This array contains blocks that can be usable
+ * even with a free plan, as well as properties
+ * used to handle specific behaviour.
+ */
+const usableBlockWithFreePlan = [
+	{
+		name: 'core/cover',
+		mediaPlaceholder: true,
+		mediaReplaceFlow: true,
+		fileType: 'video',
+	},
+	{
+		name: 'core/audio',
+		mediaPlaceholder: true,
+		mediaReplaceFlow: true,
+		fileType: 'audio',
+	},
+];
+
 /**
  * Some blocks are still usable with a free plan.
  * We can handle their dual behavior defining specifically
@@ -101,6 +122,8 @@ export function isUpgradable( name ) {
  * @param {string} name - Block name to check.
  * @returns {boolean} True is the block is usable with a Free plan. Otherwise, False.
  */
-export const isStillUsableWithFreePlan = ( name ) => [
-	'core/cover',
-].includes( name );
+export const isStillUsableWithFreePlan = name =>
+	map( usableBlockWithFreePlan, 'name' ).includes( name );
+
+export const getUsableBlockProps = blockName =>
+	head( filter( usableBlockWithFreePlan, ( { name } ) => name === blockName ) );
