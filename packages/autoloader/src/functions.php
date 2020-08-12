@@ -194,7 +194,7 @@ function reset_maps_after_update( $response, $hook_extra, $result ) { // phpcs:i
 		$plugin_dir  = str_replace( '\\', '/', WP_PLUGIN_DIR );
 		$plugin_path = trailingslashit( $plugin_dir ) . trailingslashit( explode( '/', $plugin )[0] );
 
-		if ( is_readable( $plugin_path . 'vendor/autoload_functions.php' ) ) {
+		if ( is_readable( $plugin_path . 'vendor/jetpack-autoloader/autoload_functions.php' ) ) {
 			// The plugin has a v2.x autoloader, so reset it.
 			$jetpack_autoloader_latest_version = null;
 			$jetpack_packages_psr4             = array();
