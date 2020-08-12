@@ -205,19 +205,8 @@ class Manager {
 	 * @todo Tighten $wp_xmlrpc_server_class a bit to make sure it doesn't do bad things.
 	 */
 	public function alternate_xmlrpc() {
-		// phpcs:disable PHPCompatibility.Variables.RemovedPredefinedGlobalVariables.http_raw_post_dataDeprecatedRemoved
-		// phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited
-		global $HTTP_RAW_POST_DATA;
-
 		// Some browser-embedded clients send cookies. We don't want them.
 		$_COOKIE = array();
-
-		// A fix for mozBlog and other cases where '<?xml' isn't on the very first line.
-		if ( isset( $HTTP_RAW_POST_DATA ) ) {
-			$HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
-		}
-
-		// phpcs:enable
 
 		include_once ABSPATH . 'wp-admin/includes/admin.php';
 		include_once ABSPATH . WPINC . '/class-IXR.php';
@@ -808,7 +797,7 @@ class Manager {
 	 * WordPress.com.
 	 *
 	 * @param String $api_endpoint (optional) an API endpoint to use, defaults to 'register'.
-	 * @return Integer zero on success, or a bitmask on failure.
+	 * @return true|WP_Error The error object.
 	 */
 	public function register( $api_endpoint = 'register' ) {
 		add_action( 'pre_update_jetpack_option_register', array( '\\Jetpack_Options', 'delete_option' ) );
@@ -847,20 +836,21 @@ class Manager {
 		$body = apply_filters(
 			'jetpack_register_request_body',
 			array(
-				'siteurl'         => site_url(),
-				'home'            => home_url(),
-				'gmt_offset'      => $gmt_offset,
-				'timezone_string' => (string) get_option( 'timezone_string' ),
-				'site_name'       => (string) get_option( 'blogname' ),
-				'secret_1'        => $secrets['secret_1'],
-				'secret_2'        => $secrets['secret_2'],
-				'site_lang'       => get_locale(),
-				'timeout'         => $timeout,
-				'stats_id'        => $stats_id,
-				'state'           => get_current_user_id(),
-				'site_created'    => $this->get_assumed_site_creation_date(),
-				'jetpack_version' => Constants::get_constant( 'JETPACK__VERSION' ),
-				'ABSPATH'         => Constants::get_constant( 'ABSPATH' ),
+				'siteurl'            => site_url(),
+				'home'               => home_url(),
+				'gmt_offset'         => $gmt_offset,
+				'timezone_string'    => (string) get_option( 'timezone_string' ),
+				'site_name'          => (string) get_option( 'blogname' ),
+				'secret_1'           => $secrets['secret_1'],
+				'secret_2'           => $secrets['secret_2'],
+				'site_lang'          => get_locale(),
+				'timeout'            => $timeout,
+				'stats_id'           => $stats_id,
+				'state'              => get_current_user_id(),
+				'site_created'       => $this->get_assumed_site_creation_date(),
+				'jetpack_version'    => Constants::get_constant( 'JETPACK__VERSION' ),
+				'ABSPATH'            => Constants::get_constant( 'ABSPATH' ),
+				'current_user_email' => wp_get_current_user()->user_email,
 			)
 		);
 
@@ -1110,16 +1100,16 @@ class Manager {
 	 * @param array    $args    Adds the context to the cap. Typically the object ID.
 	 */
 	public function jetpack_connection_custom_caps( $caps, $cap, $user_id, $args ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$is_development_mode = ( new Status() )->is_development_mode();
+		$is_offline_mode = ( new Status() )->is_offline_mode();
 		switch ( $cap ) {
 			case 'jetpack_connect':
 			case 'jetpack_reconnect':
-				if ( $is_development_mode ) {
+				if ( $is_offline_mode ) {
 					$caps = array( 'do_not_allow' );
 					break;
 				}
-				// Pass through. If it's not development mode, these should match disconnect.
-				// Let users disconnect if it's development mode, just in case things glitch.
+				// Pass through. If it's not offline mode, these should match disconnect.
+				// Let users disconnect if it's offline mode, just in case things glitch.
 			case 'jetpack_disconnect':
 				/**
 				 * Filters the jetpack_disconnect capability.
@@ -1131,7 +1121,7 @@ class Manager {
 				$caps = apply_filters( 'jetpack_disconnect_cap', array( 'manage_options' ) );
 				break;
 			case 'jetpack_connect_user':
-				if ( $is_development_mode ) {
+				if ( $is_offline_mode ) {
 					$caps = array( 'do_not_allow' );
 					break;
 				}
@@ -1459,6 +1449,18 @@ class Manager {
 		$this->delete_all_connection_tokens();
 
 		return true;
+	}
+
+	/**
+	 * Completely clearing up the connection, and initiating reconnect.
+	 *
+	 * @return true|WP_Error True if reconnected successfully, a `WP_Error` object otherwise.
+	 */
+	public function reconnect() {
+		$this->disconnect_site_wpcom( true );
+		$this->delete_all_connection_tokens( true );
+
+		return $this->register();
 	}
 
 	/**

@@ -32,6 +32,7 @@ class Jetpack_Plan {
 				'opentable',
 				'calendly',
 				'send-a-message',
+				'social-previews',
 			),
 		),
 		'personal' => array(
@@ -44,7 +45,6 @@ class Jetpack_Plan {
 			),
 			'supports' => array(
 				'akismet',
-				'donations',
 				'recurring-payments',
 			),
 		),
@@ -57,6 +57,7 @@ class Jetpack_Plan {
 				'value_bundle-2y',
 			),
 			'supports' => array(
+				'donations',
 				'simple-payments',
 				'vaultpress',
 				'videopress',

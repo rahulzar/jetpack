@@ -5,7 +5,7 @@ jQuery( document ).ready( function ( $ ) {
 	var tosText = $( '.jp-connect-full__tos-blurb' );
 	var jetpackConnectIframe = $( '<iframe class="jp-jetpack-connect__iframe" />' );
 	var connectionHelpSections = $(
-		'#jetpack-connection-cards, .jp-connect-full__dismiss-paragraph'
+		'#jetpack-connection-cards, .jp-connect-full__dismiss-paragraph, .jp-connect-full__testimonial'
 	);
 	var connectButtonFrom = '';
 
@@ -30,7 +30,7 @@ jQuery( document ).ready( function ( $ ) {
 		isRegistering: false,
 		isPaidPlan: false,
 		selectAndStartConnectionFlow: function () {
-			var connectionHelpSections = $( '#jetpack-connection-cards' );
+			var connectionHelpSections = $( '#jetpack-connection-cards, .jp-connect-full__testimonial' );
 			if ( connectionHelpSections.length ) {
 				connectionHelpSections.fadeOut( 600 );
 			}
@@ -125,12 +125,21 @@ jQuery( document ).ready( function ( $ ) {
 		},
 		receiveData: function ( event ) {
 			if (
-				event.origin === jpConnect.jetpackApiDomain &&
-				event.source === jetpackConnectIframe.get( 0 ).contentWindow &&
-				event.data === 'close'
+				event.origin !== jpConnect.jetpackApiDomain ||
+				event.source !== jetpackConnectIframe.get( 0 ).contentWindow
 			) {
-				window.removeEventListener( 'message', this.receiveData );
-				jetpackConnectButton.handleAuthorizationComplete();
+				return;
+			}
+
+			switch ( event.data ) {
+				case 'close':
+					window.removeEventListener( 'message', this.receiveData );
+					jetpackConnectButton.handleAuthorizationComplete();
+					break;
+				case 'wpcom_nocookie':
+					jetpackConnectIframe.hide();
+					jetpackConnectButton.handleConnectionError();
+					break;
 			}
 		},
 		handleAuthorizationComplete: function () {

@@ -40,10 +40,12 @@ function jetpack_register_block( $slug, $args = array() ) {
 	$feature_name = Jetpack_Gutenberg::remove_extension_prefix( $slug );
 	// If the block is dynamic, and a Jetpack block, wrap the render_callback to check availability.
 	if (
-		isset( $args['plan_check'], $args['render_callback'] )
+		isset( $args['plan_check'] )
 		&& true === $args['plan_check']
 	) {
-		$args['render_callback'] = Jetpack_Gutenberg::get_render_callback_with_availability_check( $feature_name, $args['render_callback'] );
+		if ( isset( $args['render_callback'] ) ) {
+			$args['render_callback'] = Jetpack_Gutenberg::get_render_callback_with_availability_check( $feature_name, $args['render_callback'] );
+		}
 		$method_name             = 'set_availability_for_plan';
 	} else {
 		$method_name = 'set_extension_available';
@@ -562,7 +564,7 @@ class Jetpack_Gutenberg {
 	 * @return bool
 	 */
 	public static function should_load() {
-		if ( ! Jetpack::is_active() && ! ( new Status() )->is_development_mode() ) {
+		if ( ! Jetpack::is_active() && ! ( new Status() )->is_offline_mode() ) {
 			return false;
 		}
 
@@ -697,7 +699,7 @@ class Jetpack_Gutenberg {
 		}
 
 		// Required for Analytics. See _inc/lib/admin-pages/class.jetpack-admin-page.php.
-		if ( ! ( new Status() )->is_development_mode() && Jetpack::is_active() ) {
+		if ( ! ( new Status() )->is_offline_mode() && Jetpack::is_active() ) {
 			wp_enqueue_script( 'jp-tracks', '//stats.wp.com/w.js', array(), gmdate( 'YW' ), true );
 		}
 

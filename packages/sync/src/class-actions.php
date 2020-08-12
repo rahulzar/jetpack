@@ -206,7 +206,7 @@ class Actions {
 			return false;
 		}
 
-		if ( ( new Status() )->is_development_mode() ) {
+		if ( ( new Status() )->is_offline_mode() ) {
 			return false;
 		}
 
@@ -387,15 +387,12 @@ class Actions {
 		}
 
 		$initial_sync_config = array(
-			'options'   => true,
-			'functions' => true,
-			'constants' => true,
-			'users'     => array( get_current_user_id() ),
+			'options'         => true,
+			'functions'       => true,
+			'constants'       => true,
+			'users'           => array( get_current_user_id() ),
+			'network_options' => true,
 		);
-
-		if ( is_multisite() ) {
-			$initial_sync_config['network_options'] = true;
-		}
 
 		self::do_full_sync( $initial_sync_config );
 	}
@@ -503,15 +500,18 @@ class Actions {
 					sleep( $delay );
 				}
 			}
-			$executions ++;
 
 			// Explicitly only allow 1 do_full_sync call until issue with Immediate Full Sync is resolved.
 			// For more context see p1HpG7-9pe-p2.
-			if ( 'full_sync' === $type && $executions > 1 ) {
+			if ( 'full_sync' === $type && $executions >= 1 ) {
 				break;
 			}
 
 			$result = 'full_sync' === $type ? self::$sender->do_full_sync() : self::$sender->do_sync();
+
+			// # of send actions performed.
+			$executions ++;
+
 		} while ( $result && ! is_wp_error( $result ) && ( $start_time + $time_limit ) > time() );
 
 		return $executions;

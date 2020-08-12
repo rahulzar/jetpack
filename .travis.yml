@@ -96,6 +96,7 @@ matrix:
           - sourceline: ppa:qameta/allure
         packages:
           - allure
+          - zip
 
   - name: "E2E tests with latest Gutenberg"
     language: generic
@@ -108,13 +109,12 @@ matrix:
     - ./tests/e2e/bin/env.sh start
     - yarn test-decrypt-config
     script:
-    - yarn test-e2e
+    - yarn test-e2e --testPathIgnorePatterns=updater
 
   allow_failures:
     - name: "PHP Nightly"
     - name: "Spell check Markdown files"
     - name: "Code Coverage"
-    - name: "E2E tests"
     - name: "E2E tests with latest Gutenberg"
 
 cache:

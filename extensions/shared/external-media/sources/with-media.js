@@ -11,9 +11,9 @@ import apiFetch from '@wordpress/api-fetch';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withNotices, Modal } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -170,18 +170,6 @@ export default function withMedia() {
 					this.modalElement.focus();
 				}
 
-				// Announce the action with appended string of all the images' alt text.
-				speak(
-					sprintf(
-						__( 'Inserting: %s', 'jetpack' ),
-						items
-							.map( item => item.title )
-							.filter( item => item )
-							.join( ', ' )
-					),
-					'polite'
-				);
-
 				apiFetch( {
 					path: apiUrl,
 					method: 'POST',
@@ -193,6 +181,7 @@ export default function withMedia() {
 							title: item.title,
 						} ) ),
 						service: source, // WPCOM.
+						post_id: this.props.postId ?? 0,
 					},
 				} )
 					.then( result => {
@@ -287,6 +276,10 @@ export default function withMedia() {
 			}
 		}
 
-		return withNotices( WithMediaComponent );
+		return withSelect( select => {
+			return {
+				postId: select( 'core/editor' ).getCurrentPostId(),
+			};
+		} )( withNotices( WithMediaComponent ) );
 	} );
 }

@@ -39,6 +39,13 @@ export async function resetWordpressInstall() {
 	await execShellCommand( cmd );
 }
 
+export async function prepareUpdaterTest() {
+	const cmd =
+		'yarn wp-env run tests-wordpress wp-content/plugins/jetpack-dev/tests/e2e/bin/prep.sh';
+
+	await execShellCommand( cmd );
+}
+
 /**
  * Provisions Jetpack plan through Jetpack Start flow
  *
