@@ -12,7 +12,7 @@ Use this hook when you need to implement a component that leads the user to the 
 import useUpgradeFlow from '../../shared/use-upgrade-flow/index';
 
 const myUPgradeComponent = () => {
-	const [ checkoutUrl, goToCheckoutPage ] = useUpgradeFlow( onRedirect );
+	const [ checkoutUrl, goToCheckoutPage ] = useUpgradeFlow( 'business-bundle' );
 	return (
         <Button
             href={ checkoutUrl }
@@ -26,9 +26,7 @@ const myUPgradeComponent = () => {
 
 ### API
 
-```es6
-const [ checkoutUrl, goToCheckoutPage ] = useUpgradeFlow( onRedirect );
-```
+const [ checkoutUrl, goToCheckoutPage ] = useUpgradeFlow( planSlug, onRedirect );
 
 The hook returns an array with two items.
 
@@ -40,4 +38,4 @@ The second item (goToCheckoutPage) is a function that can be used as a callback 
 It redirects the user to the checkout URL, checking before whether the current post/page/etc has changes to save.
 If so, it saves them before to redirect.
 
-Optionally, the hook accepts a callback argument that will be run when the redirect process triggers. 
+The hook accepts two argument. the planSug and an (optional) callback function that will be run when the redirect process triggers. 

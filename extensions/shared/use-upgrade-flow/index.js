@@ -25,17 +25,16 @@ function redirect( url, callback ) {
 
 import { getUpgradeUrl } from "../plan-utils";
 
-export default function useUpgradeFlow ( onRedirect = noop ) {
+export default function useUpgradeFlow ( planSlug, onRedirect = noop ) {
 	const { checkoutUrl, isAutosaveablePost, isDirtyPost } = useSelect( select => {
 		const editorSelector = select( 'core/editor' );
 		const planSelector = select( 'wordpress-com/plans' );
 
 		const { id: postId, type: postType } = editorSelector.getCurrentPost();
-		const PLAN_SLUG = 'value_bundle';
-		const plan = planSelector && planSelector.getPlan( PLAN_SLUG );
+		const plan = planSelector && planSelector.getPlan( planSlug );
 
 		return {
-			checkoutUrl: getUpgradeUrl( { plan, PLAN_SLUG, postId, postType } ),
+			checkoutUrl: getUpgradeUrl( { plan, planSlug, postId, postType } ),
 			isAutosaveablePost: editorSelector.isEditedPostAutosaveable(),
 			isDirtyPost: editorSelector.isEditedPostDirty(),
 		};
