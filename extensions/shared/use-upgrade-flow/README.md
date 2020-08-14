@@ -13,7 +13,7 @@ import useUpgradeFlow from '../../shared/use-upgrade-flow/index';
 const myUPgradeComponent = () => {
 	const [ checkoutUrl, goToCheckoutPage, isRedirecting ] = useUpgradeFlow( 'business-bundle' );
 	return (
-		<Button href={ checkoutUrl } onClick={ goToCheckoutPage } disabled={ isRedirecting }>
+		<Button href={ checkoutUrl } onClick={ goToCheckoutPage } isBusy={ isRedirecting }>
 			CheckOut!
 		</Button>
 	);
