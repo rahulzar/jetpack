@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -23,9 +22,9 @@ function redirect( url, callback ) {
 	window.top.location.href = url;
 }
 
-import { getUpgradeUrl } from "../plan-utils";
+import { getUpgradeUrl } from '../plan-utils';
 
-export default function useUpgradeFlow ( planSlug, onRedirect = noop ) {
+export default function useUpgradeFlow( planSlug, onRedirect = noop ) {
 	const { checkoutUrl, isAutosaveablePost, isDirtyPost } = useSelect( select => {
 		const editorSelector = select( 'core/editor' );
 		const planSelector = select( 'wordpress-com/plans' );
