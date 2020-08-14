@@ -122,6 +122,9 @@
                 "class": "Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin"
             },
             "autoload": {
+			    "classmap": [
+				  "src/AutoloadGenerator.php"
+				],
                 "psr-4": {
                     "Automattic\\Jetpack\\Autoloader\\": "src"
                 }
