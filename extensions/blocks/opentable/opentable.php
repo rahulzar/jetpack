@@ -52,7 +52,8 @@ function load_assets( $attributes ) {
 
 	Jetpack_Gutenberg::load_assets_as_required( FEATURE_NAME );
 
-	$classes = array( sprintf( 'wp-block-jetpack-%s-theme-%s', FEATURE_NAME, get_attribute( $attributes, 'style' ) ) );
+	$style   = get_attribute( $attributes, 'style' );
+	$classes = array( sprintf( 'wp-block-jetpack-%s-theme-%s', FEATURE_NAME, $style ) );
 	if ( array_key_exists( 'rid', $attributes ) && is_array( $attributes['rid'] ) && count( $attributes['rid'] ) > 1 ) {
 		$classes[] = 'is-multi';
 	}
@@ -64,7 +65,21 @@ function load_assets( $attributes ) {
 		$attributes,
 		$classes
 	);
+
 	$content = '<div class="' . esc_attr( $classes ) . '">';
+
+	// OpenTable's wide style has fixed widths within the embedded iframe.
+	// To improve the mobile experience we'll add a standard style widget as
+	// well and use CSS to switch display between the wide style and it.
+	if ( 'wide' === $style ) {
+		$fallback_attributes = array_merge( $attributes, array( 'style' => 'standard' ) );
+		$fallback_url        = build_embed_url( $fallback_attributes );
+		$content            .= '<div class="mobile-fallback">';
+		// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
+		$content .= '<script type="text/javascript" src="' . esc_url( $fallback_url ) . '"></script>';
+		$content .= '</div>';
+	}
+
 	// The OpenTable script uses multiple `rid` paramters,
 	// so we can't use WordPress to output it, as WordPress attempts to validate it and removes them.
 	// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript

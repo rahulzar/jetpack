@@ -67,4 +67,44 @@
 			}
 		}
 	}
+
+	.mobile-fallback {
+		display: none;
+	}
+
+	@media screen and (max-width: 840px) {
+		.mobile-fallback {
+			display: flex;
+
+			& + div {
+				display: none;
+			}
+		}
+
+		&.alignleft {
+			.mobile-fallback {
+				justify-content: flex-start;
+			}
+		}
+
+		&.aligncenter {
+			.mobile-fallback {
+				justify-content: center;
+			}
+		}
+
+		&.alignright {
+			.mobile-fallback {
+				justify-content: flex-end;
+			}
+		}
+		
+		&-theme-wide {
+			height: 301px;
+
+			&.is-multi {
+				height: 361px;
+			}
+		}
+	}
 }
