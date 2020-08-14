@@ -72,5 +72,5 @@ export default function useUpgradeFlow( planSlug, onRedirect = noop ) {
 		savePost( event ).then( () => redirect( checkoutUrl, onRedirect ) );
 	};
 
-	return [ checkoutUrl, goToCheckoutPage ];
+	return [ checkoutUrl, goToCheckoutPage, isRedirecting ];
 }

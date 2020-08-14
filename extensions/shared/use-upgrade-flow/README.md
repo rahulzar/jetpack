@@ -11,9 +11,9 @@ Use this hook when you need to implement a component that leads the user to the 
 import useUpgradeFlow from '../../shared/use-upgrade-flow/index';
 
 const myUPgradeComponent = () => {
-	const [ checkoutUrl, goToCheckoutPage ] = useUpgradeFlow( 'business-bundle' );
+	const [ checkoutUrl, goToCheckoutPage, isRedirecting ] = useUpgradeFlow( 'business-bundle' );
 	return (
-		<Button href={ checkoutUrl } onClick={ goToCheckoutPage }>
+		<Button href={ checkoutUrl } onClick={ goToCheckoutPage } disabled={ isRedirecting }>
 			CheckOut!
 		</Button>
 	);
