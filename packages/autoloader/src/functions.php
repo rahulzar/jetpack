@@ -79,9 +79,7 @@ function set_up_autoloader() {
  * @return bool The passed in $response param.
  */
 function reset_maps_after_update( $response, $hook_extra, $result ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	global $jetpack_autoloader_latest_version;
-	global $jetpack_packages_psr4;
-	global $jetpack_packages_classmap;
+	global $jetpack_autoloader_loader;
 
 	if ( isset( $hook_extra['plugin'] ) ) {
 		/*
@@ -107,10 +105,8 @@ function reset_maps_after_update( $response, $hook_extra, $result ) { // phpcs:i
 		$plugin_path = trailingslashit( $plugin_dir ) . trailingslashit( explode( '/', $plugin )[0] );
 
 		if ( is_readable( $plugin_path . 'vendor/jetpack-autoloader/autoload_functions.php' ) ) {
-			// The plugin has a v2.x autoloader, so reset it.
-			$jetpack_autoloader_latest_version = null;
-			$jetpack_packages_psr4             = array();
-			$jetpack_packages_classmap         = array();
+			// The plugin has a >=v2.2 autoloader, so reset the classmap.
+			$jetpack_autoloader_loader = array();
 
 			set_up_autoloader();
 		}
@@ -118,4 +114,3 @@ function reset_maps_after_update( $response, $hook_extra, $result ) { // phpcs:i
 
 	return $response;
 }
-
