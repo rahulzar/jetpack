@@ -22,15 +22,26 @@ const myUPgradeComponent = () => {
 
 ### API
 
-const [ checkoutUrl, goToCheckoutPage ] = useUpgradeFlow( planSlug, onRedirect );
+`const [ checkoutUrl, goToCheckoutPage, isRedirecting ] = useUpgradeFlow( planSlug, onRedirect );`
 
-The hook returns an array with two items.
+#### Arguments
 
-The first one (checkoutUrl) is a string with the checkout URL.
-You can use this value to set the href of an anchor element, for instance.
+The hook accepts two arguments.
 
-The second item (goToCheckoutPage) is a function that can be used as a callback in an onClick event.
-It redirects the user to the checkout URL, checking before whether the current post/page/etc has changes to save.
-If so, it saves them before to redirect.
+- `planSlug` (`string`) - Slug of plan to purchase
+- _(optional)_ `onRedirect` (`(string) => void`) - callback function that will
+  be run when the redirect process triggers. The new URL is passed.
 
-The hook accepts two argument. the planSug and an (optional) callback function that will be run when the redirect process triggers.
+### Return Values
+
+The hook returns an array with three items.
+
+- `checkoutUrl` (`string`): The checkout URL. You can use this value to set the href of an anchor element.
+- `goToCheckoutPage` (`(event) => void`): Callback to be used in an onClick event.
+
+Redirects the user to the checkout URL, checking before whether the current
+post/page/etc has changes to save. If so, it saves them before to redirect.
+
+- `isRedirecting` (`bool`): If the component is in the process of redirecting the
+  user. It may be waiting for a save to complete before redirecting. Use
+  this to set a button as busy or in a loading state.
