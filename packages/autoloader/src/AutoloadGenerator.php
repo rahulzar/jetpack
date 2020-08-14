@@ -21,7 +21,7 @@
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase
 
 
-namespace Automattic\Jetpack\Autoloader\Composer;
+namespace Automattic\Jetpack\Autoloader;
 
 use Composer\Autoload\AutoloadGenerator as BaseGenerator;
 use Composer\Autoload\ClassMapGenerator;
@@ -194,14 +194,9 @@ AUTOLOADER_COMMENT;
 			}
 		);
 
-		$classBlacklist = null;
-		if ( ! empty( $autoloads['exclude-from-classmap'] ) ) {
-			$classBlacklist = '{(' . implode( '|', $autoloads['exclude-from-classmap'] ) . ')}';
-		}
-
 		return array(
 			'psr-4'    => $processor->processPsr4Packages( $autoloads, $scanPsrPackages ),
-			'classmap' => $processor->processClassmap( $autoloads, $scanPsrPackages, $classBlacklist ),
+			'classmap' => $processor->processClassmap( $autoloads, $scanPsrPackages ),
 			'files'    => $processor->processFiles( $autoloads ),
 		);
 	}
@@ -292,7 +287,7 @@ AUTOLOADER_COMMENT;
 		$header .= 'namespace Automattic\Jetpack\Autoloader\jp' . $suffix . ';';
 		$header .= PHP_EOL . PHP_EOL;
 
-		$sourceLoader  = fopen( dirname( __DIR__ ) . '/' . $filename, 'r' );
+		$sourceLoader  = fopen( __DIR__ . '/' . $filename, 'r' );
 		$file_contents = stream_get_contents( $sourceLoader );
 		return str_replace(
 			'/* HEADER */',
